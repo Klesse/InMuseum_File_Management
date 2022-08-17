@@ -1,41 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
-AULA 3 - ROTAÇÕES E ÁRVORES AVL - DEFINIÇÃO E INSERÇÃO
-ROTAÇÃO - inverte a relação pai/filho e suas subàrvores, com corretude (respeitando a propriedade de busca);
-
-Analisando o impacto de uma rotação na altura de uma subárvore:
--Operações de rotação façam alguma coisa em relação ao balanceamento da árvore;
-
-H_antes = max{2+hA, 2+hB, 1+hC} -> O maior dos termos determina a altura da rotação (ver pdf)
-
-Depois de uma rotação à direita:
-
-H_depois = max{1+hA, 2+hB, 1+hC} -> Ver esquema do pdf
-
-ROTAÇÃO DUPLA: ROTAÇÃO À DIREITA, SEGUIDA DE ROTAÇÃO À ESQUERDA
-
-
-
-AVL: ADELSON-VELSKY AND LANDIS
-
-DEFINIÇÕES:
-*O FATOR DE BALANCEAMENTO DE UM NÓ É A DIFERENÇA ENTRE A ALTURA DE SUA SUBÁRVORE DIREITA E A ALTURA DE SUA SUBÁRVORE ESQUERDA;
-*UMA ÁRVORE É DITA AVL SE TODOS OS SEUS NÓS TEM UM FATOR DE BALANCEAMENTO ENTRE -1 E +1;
-*INTUITIVAMENTE, ESSA PROPRIEDADE GARANTE QUE UMA ÁRVORE AVL É POUCO DESBALANCEADA;
-
-COMO CALCULAR BAL:
-*CALCULAR DE BAIXO PRA CIMA;
-SUBARVOREESQ-SUBARVOREDIR;
-FATOR DE BALANCEAMENTO + 1: ALTURA DA SUBARVORE DIREITA É MAIOR QUE DA SUBARVORE ESQUERDA;
-FATOR DE BALANCEAMENTO - 1: ALTURA DA SUBARVORE ESQUERDA É MENOR QUE DA SUBARVORE DIREITA;
-FATOR DE BALANCEAMENTO 0  : ARVORE BALANCEADA (OS DOIS NÓS TEM A MESMA ALTURA);
-
-BALANCEAMENTO PODE MUDAR QUANDO OCORRE INSERÇÃO OU REMOÇÃO;
-*/
-
-//LEMBRANDO QUE A ALTURA DE UMA SUBARVORE VAZIA É -1;
 
 
 typedef int Cont;
