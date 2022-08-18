@@ -1,6 +1,5 @@
 #include <iostream>
 
-
 using namespace std;
 
 
@@ -18,24 +17,10 @@ typedef struct node{
 
 typedef node *avl;
 
-node *NewNode(key id, rrn rrn);
-avl rotationRight(avl r);
-avl rotationLeft(avl r);
-avl insertAVL(node *r, node *novo, int *increased_height);
-avl insert(avl r, key id, rrn rrn);
-avl AVLmax(avl r);
-avl AVLmin(avl r);
-avl balancing_left(avl r, int *decreased_height);
-avl balancing_right(avl r, int *decreased_height);
-avl search_remove(avl r, avl node_key, int *decreased_height);
-avl removeAVL(avl r, key id, int *decreased_height);
-avl remove(avl r, key id);
-void exibeElementos(avl r);
-
 node *NewNode(key id, rrn rrn){
     node *New;
     New = (node *)malloc(sizeof(node));
-    New->bal = 0;
+    New->bal = 1;
     New->id = id;
     New->rrn = rrn;
     New->left = NULL;
@@ -44,131 +29,123 @@ node *NewNode(key id, rrn rrn){
     return New;
 }
 
+int height(avl N)
+{
+    if (N == NULL)
+        return 0;
+    return N->bal;
+}
+
+int max(int a, int b)
+{
+    return (a > b)? a : b;
+}
+
+int getBalance(avl N)
+{
+    if (N == NULL)
+        return 0;
+    return height(N->left) - height(N->right);
+}
+
 avl rotationRight(avl r){
-    node *aux;
-    aux = r->left;
-    r->left = aux->right;
-    if (aux->right != NULL) aux->right->root = r;
-    aux->right = r;
-    r->root = aux;
-    return aux;
+
+	avl x = r->left;
+  avl T2 = x->right;
+ 
+    // Perform rotation
+  x->right = r;
+  r->left = T2;
+ 
+    // Update heights
+  r->bal = max(height(r->left), height(r->right))+1;
+  x->bal = max(height(x->left), height(x->right))+1;
+ 
+    // Return new root
+  return x;
 }
 
 avl rotationLeft(avl r){
-    node *aux;
-    aux = r->right;
-    r->right = aux->left;
-    if (aux->left != NULL) aux->left->root = r;
-    aux->left = r;
-    r->root = aux;
-    return aux;
+    avl y = r->right;
+    avl T2 = y->left;
+ 
+    // Perform rotation
+    y->left = r;
+    r->right = T2;
+ 
+    //  Update heights
+    r->bal = max(height(r->left), height(r->right))+1;
+    y->bal = max(height(y->left), height(y->right))+1;
+ 
+    // Return new root
+    return y;
 }
 
-avl insertAVL(node *r, node *novo, int *increased_height){
-    if (r == NULL){ 
-        novo->root = NULL; 
-        *increased_height = 1;
-        return novo;
+avl insert(avl r,int id, int rrn){
+    if (r == NULL)
+        return(NewNode(id,rrn));
+ 
+    if (id < r->id)
+        r->left  = insert(r->left, id,rrn);
+    else if (id > r->id)
+        r->right = insert(r->right, id,rrn);
+    else // Equal keys not allowed
+        return r;
+ 
+    /* 2. Update height of this ancestor node */
+    r->bal = 1 + max(height(r->left),height(r->right));
+ 
+    /* 3. Get the balance factor of this ancestor
+          node to check whether this node became
+          unbalanced */
+    int balance = getBalance(r);
+ 
+    // If this node becomes unbalanced, then there are 4 cases
+ 
+    // Left Left Case
+    if (balance > 1 && id < r->left->id)
+        return rotationRight(r);
+ 
+    // Right Right Case
+    if (balance < -1 && id > r->right->id)
+        return rotationLeft(r);
+ 
+    // Left Right Case
+    if (balance > 1 && id > r->left->id)
+    {
+        r->left =  rotationLeft(r->left);
+        return rotationRight(r);
     }
-    if (novo->id <= r->id){ 
-        r->left = insertAVL(r->left,novo,increased_height);
-        r->left->root = r;
-        if (*increased_height == 1){ 
-            if (r->bal == +1){ 
-                r->bal = 0;
-                *increased_height = 0;
-            }
-            else if (r->bal == 0){ 
-                r->bal = -1;
-                *increased_height = 1;
-            }
-            else if (r->bal == -1){ 
-                if (r->left->bal == -1){ 
-                    r = rotationRight(r); 
-                    r->right->bal = 0;
-                }
-                else{ 
-                    r->left = rotationLeft(r->left);
-                    r = rotationRight(r);
-                    if (r->bal == 0){ 
-                        r->left->bal = 0;
-                        r->right->bal = 0;
-                    }
-                    else if (r->bal == -1){ 
-                        r->left->bal = 0;
-                        r->right->bal = +1;
-                    }
-                    else{ 
-                        r->left->bal = -1;
-                        r->right->bal = 0;
-                    }
-                }
-                r->bal = 0;
-                *increased_height = 0;
-            }
-        }
+ 
+    // Right Left Case
+    if (balance < -1 && id < r->right->id)
+    {
+        r->right = rotationRight(r->right);
+        return rotationLeft(r);
     }
-    else{
-        r->right = insertAVL(r->right, novo, increased_height);
-        r->right->root = r;
-        if (*increased_height == 1){ 
-            if (r->bal == -1){ 
-                r->bal = 0;
-                *increased_height = 0;
-            }
-            else if (r->bal == 0){ 
-                r->bal = 1; 
-                *increased_height = 1;
-            }
-            
-            else if (r->bal == 1){ 
-                if (r->right->bal == 1){ 
-                    r = rotationLeft(r);
-                    r->left->bal = 0;
-                }
-                else{ 
-                    r->right = rotationRight(r->right);
-                    r = rotationLeft(r);
-                    if (r->bal == 0){ 
-                        r->left->bal = 0;
-                        r->right->bal = 0;
-                    }
-                    else if (r->bal == -1){ 
-                        r->left->bal = 0;
-                        r->right->bal = 1;
-                    }
-                    else{ 
-                        r->left->bal = -1;
-                        r->right->bal = 0;
-                    }
-                }
-                r->bal = 0;
-                *increased_height = 0;
-            }
-        }
-    }
+ 
+    /* return the (unchanged) node pointer */
     return r;
 }
 
-
-avl insert(avl r, key id, rrn rrn){
-    int increased_height;
-    node *New = NewNode(id,rrn);
-    return insertAVL(r, New, &increased_height);
-}
 
 avl AVLmax(avl r){
     if(r->right == NULL) return r;
     return AVLmax(r);
 }
 
-avl AVLmin(avl r){
-    if (r == NULL) return r;
-    return AVLmin(r->left);
+avl minValueNode(avl r){
+	avl current = r;
+ 
+    /* loop down to find the leftmost leaf */
+  while (current->left != NULL)
+        current = current->left;
+ 
+  return current;
 }
 
 avl balancing_left(avl r, int *decreased_height){
-    if (r->bal == -1){ 
+    if (r->bal == -1){ //estou removendo do lado esquerdo, isso implica  que o meu fator de balanceamento fica 0
         r->bal = 0;
         r->left->bal = 0;
     }
@@ -176,7 +153,8 @@ avl balancing_left(avl r, int *decreased_height){
         r->bal = 1;
         *decreased_height = 0;
     }
-    else{ 
+    else{ //altura foi altera e desbalanceou
+    //em qual caso estou? (vou fazer rotação simples ou dupla?)
         if (r->right->bal >= 0){
             r = rotationLeft(r);
             if (r->bal == 0){
@@ -184,7 +162,7 @@ avl balancing_left(avl r, int *decreased_height){
                 r->bal = -1;
                 *decreased_height = 0;
             }
-            else{ 
+            else{ //r->bal == 1;
                 r->left->bal = 0;
                 r->bal = 0;
             }
@@ -212,7 +190,7 @@ avl balancing_left(avl r, int *decreased_height){
 
 
 avl balancing_right(avl r, int *decreased_height){
-    if (r->bal == 1){ 
+    if (r->bal == 1){ //estou removendo do lado direito, isso implica  que o meu fator de balanceamento fica 0
         r->bal = 0;
         r->left->bal = 0;
     }
@@ -220,7 +198,8 @@ avl balancing_right(avl r, int *decreased_height){
         r->bal = -1;
         *decreased_height = 0;
     }
-    else{ 
+    else{ //altura foi altera e desbalanceou
+    //em qual caso estou? (vou fazer rotação simples ou dupla?)
         if (r->left->bal <= 0){
             r = rotationRight(r);
             if (r->bal == 0){
@@ -228,12 +207,12 @@ avl balancing_right(avl r, int *decreased_height){
                 r->bal = 1;
                 *decreased_height = 0;
             }
-            else{ 
+            else{ //r->bal == -1;
                 r->right->bal = 0;
                 r->bal = 0;
             }
         }
-        
+        //CASOS ROTAÇÃO DUPLA
         else{
             r->left = rotationLeft(r);
             r = rotationRight(r);
@@ -274,71 +253,131 @@ avl search_remove(avl r, avl node_key, int *decreased_height){
     return r;
 }
 
-avl removeAVL(avl r, key id, int *decreased_height){
-    node *aux = NULL;
-    if (r == NULL){ 
-        *decreased_height = 0;
-    }
-    else if(id < r->id){ 
-        r->left = removeAVL(r->left, id, decreased_height);
-        if (*decreased_height == 1){
-            r = balancing_left(r, decreased_height);
-        }
-    }
-    else if(id > r->id){
-        r->right = removeAVL(r->right, id, decreased_height);
-        if (*decreased_height == 1){
-            r = balancing_right(r, decreased_height);
-        }
-    }
-    else{
-        if (r->right == NULL){ 
-            aux = r;
-            r = r->left;
-            free(aux);
-            *decreased_height = 1;
-        }
-        else if (r->left == NULL){ 
-            aux = r;
-            r = r->right;
-            free(aux);
-            *decreased_height = 1;
-        }
-        
-        else{
-            r->left = search_remove(r->left, r, decreased_height);
-            if (*decreased_height == 1){
-                r = balancing_left(r, decreased_height);
+
+avl deleteNode(avl root, int id)
+{
+    // STEP 1: PERFORM STANDARD BST DELETE
+ 
+    if (root == NULL)
+        return root;
+ 
+    // If the key to be deleted is smaller than the
+    // root's key, then it lies in left subtree
+    if ( id < root->id )
+        root->left = deleteNode(root->left, id);
+ 
+    // If the key to be deleted is greater than the
+    // root's key, then it lies in right subtree
+    else if( id > root->id )
+        root->right = deleteNode(root->right,id);
+ 
+    // if key is same as root's key, then This is
+    // the node to be deleted
+    else
+    {
+        // node with only one child or no child
+        if( (root->left == NULL) || (root->right == NULL) )
+        {
+            avl temp = root->left ? root->left :root->right;
+ 
+            // No child case
+            if (temp == NULL)
+            {
+                temp = root;
+                root = NULL;
             }
+            else // One child case
+             root = temp; // Copy the contents of
+                            // the non-empty child
+            free(temp);
+        }
+        else
+        {
+            // node with two children: Get the inorder
+            // successor (smallest in the right subtree)
+            avl temp = minValueNode(root->right);
+ 
+            // Copy the inorder successor's data to this node
+            root->id = temp->id;
+ 
+            // Delete the inorder successor
+            root->right = deleteNode(root->right, temp->id);
         }
     }
-    return r;
-}
-
-avl remove(avl r, key id){
-    int decreased_height = 0;
-    node *removed = removeAVL(r, id, &decreased_height);
-    return removed;
-}
-
-void exibeElementos(avl r){
-    if (r != NULL){
-        exibeElementos(r->right);
-        cout<< "%d ->"<< r->id<<endl;
-        exibeElementos(r->left);
+ 
+    // If the tree had only one node then return
+    if (root == NULL)
+      return root;
+ 
+    // STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
+    root->bal = 1 + max(height(root->left),height(root->right));
+ 
+    // STEP 3: GET THE BALANCE FACTOR OF THIS NODE (to
+    // check whether this node became unbalanced)
+    int balance = getBalance(root);
+ 
+    // If this node becomes unbalanced, then there are 4 cases
+ 
+    // Left Left Case
+    if (balance > 1 && getBalance(root->left) >= 0)
+        return rotationRight(root);
+ 
+    // Left Right Case
+    if (balance > 1 && getBalance(root->left) < 0)
+    {
+        root->left =  rotationLeft(root->left);
+        return rotationRight(root);
     }
+ 
+    // Right Right Case
+    if (balance < -1 && getBalance(root->right) <= 0)
+        return rotationLeft(root);
+ 
+    // Right Left Case
+    if (balance < -1 && getBalance(root->right) > 0)
+    {
+        root->right = rotationRight(root->right);
+        return rotationRight(root);
+    }
+ 
+    return root;
+}
+
+
+void printInorder(avl node)
+{
+    if (node == NULL)
+        return;
+  
+    /* first recur on left child */
+    printInorder(node->left);
+  
+    /* then print the data of node */
+    cout << node->id << " ";
+  
+    /* now recur on right child */
+    printInorder(node->right);
 }
 
 int main(int argc, char const *argv[]){
-    avl r = NULL;
+    avl root = NULL;
     cout<<"Inserindo elementos:"<<endl;
-    for (int i = 0; i < 10; i++){
-        r = insert(r, i, i);
-    }
-    exibeElementos(r);
+    root = insert(root,0,1);
+    root = insert(root,1,1);
+    root = insert(root,2,1);
+    root = insert(root,3,1);
+    root = insert(root,4,1);
+    root = insert(root,5,1);
+    root = insert(root,6,1);
+    root = insert(root,7,1);
+    root = insert(root,8,1);
+		root = insert(root,9,1);
+    printInorder(root);
     cout<<endl;
     cout<<"Removendo..."<<endl;
-    r = remove(r, 1);
-    exibeElementos(r);
+    root = deleteNode(root,3);
+    printInorder(root);
+		cout<<"\nRAIZ:"<<root->id<<endl;
+		cout<<root->left->id<<root->right->id<<endl;
     return 0;
 }
