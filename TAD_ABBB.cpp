@@ -1,21 +1,4 @@
-#include <iostream>
-
-using namespace std;
-
-
-typedef int rrn;
-typedef int key;
-
-typedef struct node{
-    int bal;
-    key id;
-    rrn rrn;
-    struct node *root;
-    struct node *left;
-    struct node *right;
-} node;
-
-typedef node *avl;
+#include "ABBB.h"
 
 node *NewNode(key id, rrn rrn){
     node *New;
@@ -29,26 +12,26 @@ node *NewNode(key id, rrn rrn){
     return New;
 }
 
-int height(avl N)
+int ABBB::height(avl N)
 {
     if (N == NULL)
         return 0;
     return N->bal;
 }
 
-int max(int a, int b)
+int ABBB::max(int a, int b)
 {
     return (a > b)? a : b;
 }
 
-int getBalance(avl N)
+int ABBB::getBalance(avl N)
 {
     if (N == NULL)
         return 0;
     return height(N->left) - height(N->right);
 }
 
-avl rotationRight(avl r){
+avl ABBB::rotationRight(avl r){
 
 	avl x = r->left;
   avl T2 = x->right;
@@ -65,7 +48,7 @@ avl rotationRight(avl r){
   return x;
 }
 
-avl rotationLeft(avl r){
+avl ABBB::rotationLeft(avl r){
     avl y = r->right;
     avl T2 = y->left;
  
@@ -81,7 +64,7 @@ avl rotationLeft(avl r){
     return y;
 }
 
-avl insert(avl r,int id, int rrn){
+avl ABBB::insert(avl r,int id, int rrn){
     if (r == NULL)
         return(NewNode(id,rrn));
  
@@ -129,12 +112,12 @@ avl insert(avl r,int id, int rrn){
 }
 
 
-avl AVLmax(avl r){
+avl ABBB::AVLmax(avl r){
     if(r->right == NULL) return r;
     return AVLmax(r);
 }
 
-avl minValueNode(avl r){
+avl ABBB::minValueNode(avl r){
 	avl current = r;
  
     /* loop down to find the leftmost leaf */
@@ -144,7 +127,7 @@ avl minValueNode(avl r){
   return current;
 }
 
-avl balancing_left(avl r, int *decreased_height){
+avl ABBB::balancing_left(avl r, int *decreased_height){
     if (r->bal == -1){ //estou removendo do lado esquerdo, isso implica  que o meu fator de balanceamento fica 0
         r->bal = 0;
         r->left->bal = 0;
@@ -189,7 +172,7 @@ avl balancing_left(avl r, int *decreased_height){
 }
 
 
-avl balancing_right(avl r, int *decreased_height){
+avl ABBB::balancing_right(avl r, int *decreased_height){
     if (r->bal == 1){ //estou removendo do lado direito, isso implica  que o meu fator de balanceamento fica 0
         r->bal = 0;
         r->left->bal = 0;
@@ -235,7 +218,7 @@ avl balancing_right(avl r, int *decreased_height){
 }
 
 
-avl search_remove(avl r, avl node_key, int *decreased_height){
+avl ABBB::search_remove(avl r, avl node_key, int *decreased_height){
     node *aux;
     if (r->right != NULL){
         r->right = search_remove(r, node_key, decreased_height);
@@ -254,7 +237,7 @@ avl search_remove(avl r, avl node_key, int *decreased_height){
 }
 
 
-avl deleteNode(avl root, int id)
+avl ABBB::deleteNode(avl root, int id)
 {
     // STEP 1: PERFORM STANDARD BST DELETE
  
@@ -344,7 +327,7 @@ avl deleteNode(avl root, int id)
 }
 
 
-void printInorder(avl node)
+void ABBB::printInorder(avl node)
 {
     if (node == NULL)
         return;
@@ -359,25 +342,3 @@ void printInorder(avl node)
     printInorder(node->right);
 }
 
-int main(int argc, char const *argv[]){
-    avl root = NULL;
-    cout<<"Inserindo elementos:"<<endl;
-    root = insert(root,0,1);
-    root = insert(root,1,1);
-    root = insert(root,2,1);
-    root = insert(root,3,1);
-    root = insert(root,4,1);
-    root = insert(root,5,1);
-    root = insert(root,6,1);
-    root = insert(root,7,1);
-    root = insert(root,8,1);
-		root = insert(root,9,1);
-    printInorder(root);
-    cout<<endl;
-    cout<<"Removendo..."<<endl;
-    root = deleteNode(root,3);
-    printInorder(root);
-		cout<<"\nRAIZ:"<<root->id<<endl;
-		cout<<root->left->id<<root->right->id<<endl;
-    return 0;
-}
