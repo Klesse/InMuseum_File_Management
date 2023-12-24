@@ -6,10 +6,15 @@
 
 # How to run
 1. Compile the program
+   
 `g++ main.cpp -o program`
+
 2. Give permission to execution (Linux)
+
 `chmod +x program`
+
 3. Execute the program (Linux)
+
 `./program`
 
 
