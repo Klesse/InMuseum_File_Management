@@ -1,4 +1,4 @@
-# InMuseum App
+# 🏛️ InMuseum App
 
 - InMuseum is an Application wich has te purpose to study file and index management.
 - It's an App that stores information about a fictional museum.
@@ -6,7 +6,6 @@
 
 # How to run
 1. Compile the program
-
 
 `g++ main.cpp -o program`
 
