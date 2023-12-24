@@ -19,9 +19,13 @@
 `./program`
 
 
-Authors:
+# Authors:
+
 [Brainer Sueverti de Campos](www.github.com/hiperbrainer)
+
 [Pedro Malandrin Klesse](www.github.com/Klesse)
+
 [Thiago Martins](www.github.com/thiago0003)
+
 [Vitor Caligaris Figueira](www.github.com/vitorcf10)
 
